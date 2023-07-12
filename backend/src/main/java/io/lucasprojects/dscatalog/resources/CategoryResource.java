@@ -31,30 +31,30 @@ public class CategoryResource {
 
         Page<CategoryDTO> list = categoryService.findAllPaged(pageable);
         return ResponseEntity.ok().body(list);
-    } 
-    
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<CategoryDTO> findById(@PathVariable Long id) {
 
         CategoryDTO dto = categoryService.findById(id);
         return ResponseEntity.ok().body(dto);
-    } 
+    }
 
     @PostMapping
-    public ResponseEntity<CategoryDTO> insert(@RequestBody CategoryDTO dto){
+    public ResponseEntity<CategoryDTO> insert(@RequestBody CategoryDTO dto) {
 
         dto = categoryService.insert(dto);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                                             .path("/{id}")
-                                             .buildAndExpand(dto.getId())
-                                             .toUri();
+                .path("/{id}")
+                .buildAndExpand(dto.getId())
+                .toUri();
 
         return ResponseEntity.created(uri).body(dto);
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<CategoryDTO> update(@PathVariable Long id ,@RequestBody CategoryDTO dto){
+    public ResponseEntity<CategoryDTO> update(@PathVariable Long id, @RequestBody CategoryDTO dto) {
 
         dto = categoryService.update(id, dto);
 
@@ -62,12 +62,11 @@ public class CategoryResource {
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id){
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
 
         categoryService.delete(id);
 
         return ResponseEntity.noContent().build();
     }
-
 
 }

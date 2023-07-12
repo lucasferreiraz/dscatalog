@@ -34,7 +34,7 @@ public class Category implements Serializable {
     private Instant updatedAt;
 
     @ManyToMany(mappedBy = "categories")
-    Set<Product> products = new HashSet<>();
+    private Set<Product> products = new HashSet<>();
 
     public Category() {
     }
