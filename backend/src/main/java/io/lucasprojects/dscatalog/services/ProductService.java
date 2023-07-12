@@ -27,7 +27,7 @@ import io.lucasprojects.dscatalog.services.exceptions.ResourceNotFoundException;
 public class ProductService {
 
     @Autowired
-    private ProductRepository ProductRepository;
+    private ProductRepository productRepository;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -35,17 +35,18 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Page<ProductDTO> findAllPaged(Long categoryId, String name, Pageable pageable) {
 
-        List<Category> categories = (categoryId == 0) ? null : Arrays.asList(categoryRepository.getReferenceById(categoryId));
+        List<Category> categories = (categoryId == 0) ?     null : Arrays.asList(categoryRepository.getReferenceById(categoryId));
 
-        Page<Product> list = ProductRepository.find(categories, name, pageable);
-        Page<ProductDTO> listDTO = list.map(Product -> new ProductDTO(Product));
+        Page<Product> list = productRepository.find(categories, name, pageable);
+        productRepository.findProductsWithCategories(list.getContent());
+        Page<ProductDTO> listDTO = list.map(product -> new ProductDTO(product, product.getCategories()));
 
         return listDTO;
     }
 
     @Transactional(readOnly = true)
     public ProductDTO findById(Long id){
-        Optional<Product> obj = ProductRepository.findById(id);
+        Optional<Product> obj = productRepository.findById(id);
         Product entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found or not exist."));
         return new ProductDTO(entity, entity.getCategories());
     }
@@ -57,7 +58,7 @@ public class ProductService {
         copyDtoToEntity(dto, entity);
         //entity.setName(dto.getName());
 
-        entity = ProductRepository.save(entity);
+        entity = productRepository.save(entity);
 
         return new ProductDTO(entity);
 
@@ -67,12 +68,12 @@ public class ProductService {
     public ProductDTO update(Long id, ProductDTO dto){
         try {
 
-            Product entity = ProductRepository.getReferenceById(id);
+            Product entity = productRepository.getReferenceById(id);
 
             copyDtoToEntity(dto, entity);
 
             //entity.setName(dto.getName());
-            entity = ProductRepository.save(entity);
+            entity = productRepository.save(entity);
             return new ProductDTO(entity); 
 
         } catch (EntityNotFoundException e) {
@@ -83,7 +84,7 @@ public class ProductService {
 
     public void delete(Long id){
         try {
-            ProductRepository.deleteById(id);
+            productRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
             throw new ResourceNotFoundException("ID not found" + id);
         } catch (DataIntegrityViolationException e){
